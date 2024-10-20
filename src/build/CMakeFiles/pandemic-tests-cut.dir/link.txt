@@ -1,0 +1,1 @@
+/usr/bin/cc  -std=c99 -Wall -Wextra -pedantic -g -g CMakeFiles/pandemic-tests-cut.dir/tests/tests-cut/lib/cut_main_runner.c.o CMakeFiles/pandemic-tests-cut.dir/tests/tests-cut/lib/utils.c.o CMakeFiles/pandemic-tests-cut.dir/tests/tests-cut/tests.c.o CMakeFiles/pandemic-tests-cut.dir/src/world_utils.c.o -o pandemic-tests-cut 
