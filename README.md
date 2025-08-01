@@ -5,8 +5,9 @@ Tento projekt je jednoduchou **agent-based simulací šíření viru** v populac
 ## Spuštění programu
 
 Program se spouští následovně:
-
+```bash
 ./pandemic [OPTIONS] agents.csv world.csv
+```
 
 ### Povinné argumenty
 - `agents.csv` - CSV soubor s definicemi agentů
