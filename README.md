@@ -41,6 +41,7 @@ id;name;exposure
 0;Park;0.3
 1;Škola;0.8
 2;Obchod;0.6
+```
 
 ### agents.csv - Definice agentů
 - `id` (int): Unikátní identifikátor agenta
@@ -53,13 +54,26 @@ id;name;exposure
 
 #### Příklad:
 
-`agents.csv`:
+```csv
+id;location;state
 1;0;I
 2;2;S
 3;1;R
+```
 
 ## Ukázky použití
 
 Spuštění simulace s výchozími parametry:
 ```bash
-`./pandemic agents.csv world.csv`
+./pandemic agents.csv world.csv
+```
+
+Spuštění s definovaným seedem, 100 kroky a jen souhrnem:
+```bash
+./pandemic --random-seed 42 --max-steps 100 --summary agents.csv world.csv
+```
+
+Ladění s výpisem náhodných hodů:
+```bash
+./pandemic --verbose --infectivity 0.7 --lethality 0.3 agents.csv world.csv
+```
