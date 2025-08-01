@@ -36,7 +36,8 @@ Soubor popisuje jednotlivá místa, kde se agenti mohou vyskytovat. Každý řá
 
 #### Příklad:
 
-`world.csv`:
+```csv
+id;name;exposure
 0;Park;0.3
 1;Škola;0.8
 2;Obchod;0.6
