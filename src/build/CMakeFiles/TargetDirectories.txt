@@ -1,4 +1,0 @@
-/home/lukso/pb071/hw06/src/build/CMakeFiles/pandemic-tests-cut.dir
-/home/lukso/pb071/hw06/src/build/CMakeFiles/pandemic.dir
-/home/lukso/pb071/hw06/src/build/CMakeFiles/edit_cache.dir
-/home/lukso/pb071/hw06/src/build/CMakeFiles/rebuild_cache.dir

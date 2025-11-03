@@ -1,1 +1,0 @@
-/usr/bin/cc  -std=c99 -Wall -Wextra -pedantic -g -g CMakeFiles/pandemic.dir/src/main.c.o CMakeFiles/pandemic.dir/src/world_utils.c.o -o pandemic 
