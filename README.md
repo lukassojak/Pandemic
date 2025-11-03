@@ -1,80 +1,113 @@
-# Pandemic — Agent-based simulace šíření pandemie
+# Pandemic
 
-Tento projekt je jednoduchou **agent-based simulací šíření viru** v populaci. Vstupem jsou data o **agentech** a **světě (místech)**, kde se pohybují, a parametry viru jsou zadávány jako **přepínače z příkazové řádky**.
+**Agent-based pandemic simulator implemented in C**
 
-## Spuštění programu
+Pandemic is a simple simulation of disease spread in a population of moving agents.  
+Each agent moves between locations (defined in a world file), may become infected, recover, or die.  
+Simulation parameters such as infectivity, lethality, duration, and vaccine efficiency are configurable from the command line.
 
-Program se spouští následovně:
+---
+
+## Features
+
+- Agent-based model with discrete time steps  
+- Parameterized virus model (infectivity, lethality, duration, vaccine modifier)  
+- Reproducible runs via random seed  
+- Two modes of output:
+  - `--summary` — concise simulation summary
+  - `--verbose` — step-by-step log including random rolls
+- Deterministic behavior for identical seeds and inputs  
+- Simple CSV input format for agents and world configuration  
+
+---
+
+## Build
+
 ```bash
-./pandemic [OPTIONS] agents.csv world.csv
+git clone https://github.com/lukassojak/Pandemic.git
+cd Pandemic
+cmake -S . -B build
+cmake --build build
 ```
 
-### Povinné argumenty
-- `agents.csv` - CSV soubor s definicemi agentů
-- `world.csv` - CSV soubor popisující místa (vrcholy úplného grafu)
+This produces the executable `pandemic` in the `build` directory:
+```bash
+/build/pandemic
+```
 
-### Volitelné přepínače
-- `--lethality <float>`: Smrtnost viru (0-1). Výchozí hodnota: `0.5`
-- `--infectivity <float>`: Infekčnost viru (0–1). Výchozí hodnota: `0.5`
-- `--duration <float>`: Doba infekčnosti (0–1). Výchozí hodnota: `0.5`
-- `--vaccine-modifier <float>`: Účinnost vakcíny (≥ 0). Výchozí hodnota: `1.2`
-- `--max-steps <int>`: Maximální počet kroků simulace. Pokud není zadáno, běží simulace až do konce (všichni agenti se uzdraví nebo zemřou).
-- `--random-seed <int>`: Seed pro generátor náhodných čísel (pro testování a reprodukovatelnost). Výchozí hodnota: `time(NULL)`
-- `--summary`: Vypíše pouze finální štatistiku simulace (bez detailního výpisu kroků).
-- `--verbose`: Zahrne do výstupu i hodnoty náhodných hodů použitých při simulaci.
+---
 
-> ⚠️ Přepínače `--summary` a `--verbose` se vzájemně vylučují. Pokud jsou zadány oba, program vypíše chybové hlášení na standardní chybový výstup a ukončí se.
+## Usage
 
+```bash
+./build/pandemic [options] <agents_file> <world_file>
+```
 
-## Struktura vstupních souborů
+### Options
 
-### world.csv — Definice světa
+| Option               | Argument         | Description                                      | Default        |
+|----------------------|------------------|--------------------------------------------------|----------------|
+| `--lethality`        | `<float>` (0-1)  | Probability of death when infected               | `0.5`          |
+| `--infectivity`      | `<float>` (0-1)  | Probability of infection upon contact            | `0.5`          |
+| `--duration`         | `<float>` (0-1)  | Probability of recovery at each step             | `0.5`          |
+| `--vaccine-modifier` | `<float>`  >0    | Reduction in infection probability if vaccinated | `1.2`          |
+| `--max-steps`        | `<int>`    >0    | Maximum number of simulation steps               | Not limited    |
+| `--random-seed`      | `<int>`          | Seed for random number generator                 | `time(NULL)`   |
+| `--summary`          |                  | Compact summary output                           | Disabled       |
+| `--verbose`          |                  | Extend output with random rolls                  | Disabled       |
 
-Soubor popisuje jednotlivá místa, kde se agenti mohou vyskytovat. Každý řádek reprezentuje jeden vrchol úplného grafu:
-- `id` (int): Unikátní nezáporný identifikátor místa
-- `name` (string): Název místa (max. délka min. 16 ASCII znaků)
-- `exposure` (float): Nezáporná hodnota vyjadřující úroveň expozice viru na daném místě (vyšší hodnota = větší pravděpodobnost šíření nákazy)
+> *Note:* Only one of `--summary` or `--verbose` can be used at a time.
 
-#### Příklad:
+---
 
+## Example
+
+### Input Files
+**world.csv**
+Each line represents a location with the following fields:
 ```csv
 id;name;exposure
-0;Park;0.3
-1;Škola;0.8
-2;Obchod;0.6
 ```
 
-### agents.csv - Definice agentů
-- `id` (int): Unikátní identifikátor agenta
-- `location` (int): ID místa, kde se agent nachází na začátku simulace (odkazuje na `id` z `world.csv`)
-- `state` (char): Počáteční zdravotní stav agenta:
-  - `S` — Susceptible (náchylný k nákaze)
-  - `I` — Infected (nakažený)
-  - `R` — Recovered (vyléčený)
-  - `D` — Dead (mrtvý) — obvykle není použitý na začátku simulace
+- `id`: Unique identifier for the location (non-negative integer)
+- `name`: Name of the location (string, supported length up to 16 ASCII characters)
+- `exposure`: Affecting factor for infection probability at this location (float >= 0)
 
-#### Příklad:
-
+Example:
 ```csv
-id;location;state
-1;0;I
-2;2;S
-3;1;R
+1;Home;0.5
+2;Work;3.8
+3;Park;1.0
+4;Supermarket;3.0
 ```
 
-## Ukázky použití
+**agents.csv**
+Each line represents an agent with the following fields:
+```csv
+id;route;is_vaccinated;immunity;is_infected
+```
 
-Spuštění simulace s výchozími parametry:
+- `id`: Unique identifier for the agent (non-negative integer)
+- `route`: Dash-separated list of location IDs representing the agent's movement path. After reaching the end, the agent loops back to the start. All location IDs must exist in the world file.
+- `is_vaccinated`: Vaccination status (1 for vaccinated, 0 for not vaccinated)
+- `immunity`: Initial immunity level (float between 0 and 1)
+- `is_infected`: Infection status at the start (1 for infected, 0 for not infected)
+
+Example:
+```csv
+1;4-1-3;1;0.5;0
+2;5-1-3;1;0.5;0
+3;5;1;0.2;0
+4;4;0;0.2;1
+5;5-2-3-1-3;0;0.5;1
+```
+
+> *Note:* In both CSV files, fields are separated by semicolons (`;`) and header lines are not expected.
+
+### Run
 ```bash
-./pandemic agents.csv world.csv
+./build/pandemic --infectivity 0.3 --verbose examples/agents2.csv examples/world2.csv
 ```
 
-Spuštění s definovaným seedem, 100 kroky a jen souhrnem:
-```bash
-./pandemic --random-seed 42 --max-steps 100 --summary agents.csv world.csv
-```
-
-Ladění s výpisem náhodných hodů:
-```bash
-./pandemic --verbose --infectivity 0.7 --lethality 0.3 agents.csv world.csv
-```
+## License
+This project is licensed under the MIT License © 2025 Lukáš Soják

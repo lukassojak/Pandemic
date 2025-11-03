@@ -7,39 +7,12 @@ set(EXECUTABLE pandemic)
 
 file(GLOB TESTS_DATA "tests/data")
 
-# CUT Tests
-file(GLOB TESTS_CUT_GLOB "tests/tests-cut/*.c")
-file(GLOB TESTS_CUT_LIB_GLOB "tests/tests-cut/lib/*.c")
-
-set(SOURCES_LIB ${SOURCES})
-list(FILTER SOURCES_LIB EXCLUDE REGEX "/?main\\.c$")
-
-foreach (file_path ${TESTS_CUT_GLOB})
-    message("Found test: " ${file_path})
-endforeach ()
-
-set(TEST_SOURCES
-    ${TESTS_CUT_LIB_GLOB}
-    ${TESTS_CUT_GLOB}
-    ${SOURCES_LIB}
-)
-
-add_definitions(-DCUT -DCUT_TIMEOUT=15 -DWRAP_INDIRECT)
-add_executable(pandemic-tests-cut ${TEST_SOURCES})
-
-# Symlink data files
-file(CREATE_LINK ${TESTS_DATA} "${CMAKE_BINARY_DIR}/data" SYMBOLIC)
 
 # Executable
 add_executable(pandemic ${SOURCES})
 
-# CLI Tests
-file(GLOB TESTS_CLI_SH "tests/tests-cli/*.sh")
-file(COPY ${TESTS_CLI_SH} "tests/tests-cli/pandemic-tests-cli" DESTINATION ${CMAKE_BINARY_DIR})
-
 # Enable posix
 target_compile_definitions(pandemic PUBLIC -D_POSIX_C_SOURCE=200809L)
-target_compile_definitions(pandemic-tests-cut PUBLIC -D_POSIX_C_SOURCE=200809L)
 
 # -------------------------------------------------------------------
 # DO NOT EDIT LINES BELOW lest you break it
